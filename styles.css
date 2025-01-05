@@ -1,0 +1,10 @@
+body{
+    /* background-color: gray; */
+    background-image: linear-gradient(lightgray,gray);
+    min-height: 100vh;
+
+}
+
+.main{
+    font-size: 20pt;
+}
