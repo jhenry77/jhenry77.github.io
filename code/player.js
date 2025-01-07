@@ -1,5 +1,5 @@
 import { Vector } from './vector.js';
-// import {importFolder} from './helpful.js'
+import {preloadImages} from './helpful.js'
 
 export class Player {
   constructor() {
@@ -41,9 +41,9 @@ export class Player {
         'left_hoe':[ "../graphics/character/left_hoe/"],
         'up_hoe':[ "../graphics/character/up_hoe/"],
         'down_hoe':[ "../graphics/character/down_hoe/"],
-				'right_axe':[ "../graphics/character/'right_axe/"],
+				'right_axe':[ "../graphics/character/right_axe/"],
         'left_axe':[ "../graphics/character/left_axe/"],
-        'up_axe':[ "../graphics/character/'up_axe/"],
+        'up_axe':[ "../graphics/character/up_axe/"],
         'down_axe':[ "../graphics/character/down_axe/"],
 				'right_water':[ "../graphics/character/right_water/"],
         'left_water':[ "../graphics/character/left_water/"],
@@ -71,10 +71,18 @@ export class Player {
           'up_water':2,
           'down_water':2}
         
-      // for (const anims in this.animations){
-      //   let path = '../graphics/character/' + anims
-      //   this.animations[anims] = importFolder(path)
-      // }
+      let urls = [];
+      for(let anim in this.animations){
+        let basePath = this.animations[anim]
+        let numFrames = this.animationsLength[anim]
+
+        for(let i = 0; i < numFrames; i++){
+          let imagePath = basePath + i + ".png";
+          urls.push(imagePath);
+        }
+      }
+      console.log(urls);
+      preloadImages(urls);
 
   }
 

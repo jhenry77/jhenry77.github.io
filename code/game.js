@@ -1,5 +1,8 @@
 import { Vector } from './vector.js';
 import {Player} from './player.js';
+import {preloadImages} from './helpful.js'
+
+
 
 // Setup canvas
 
