@@ -1,62 +1,77 @@
 import { Vector } from './vector.js';
-import { player, loadFrames } from './player.js';
-import { keys, setupInput } from './input.js';
+import {Player} from './player.js';
 
 // Setup canvas
+
 let canvas = document.createElement('canvas');
 let ctx = canvas.getContext('2d');
 document.body.appendChild(canvas);
 canvas.width = 800;
 canvas.height = 600;
 
-let isRunning = true;
+
 let lastTime = performance.now();
+const player = new Player();
 
+
+
+
+let isRunning = true;
+// Game loop
 function gameLoop(timestamp) {
-  if (!isRunning) return;
+  if (!isRunning){
+    return
+  }; // Exit the loop if the game stops
 
+  // Update game state
   let deltaTime = (timestamp - lastTime) / 1000;
   lastTime = timestamp;
-
   update(deltaTime);
+  
+  // Render the game
   draw();
 
-  requestAnimationFrame(gameLoop);
+  // Loop
+   requestAnimationFrame(gameLoop);
 }
+//Listens for specific user input
+// function getInput(){
+//     if (keys.ArrowLeft){ 
+//         player.direction.x = -1
+//     }else if (keys.ArrowRight){
+//         player.direction.x = 1
+//     }else{
+//         player.direction.x = 0;
+//     }
 
+//     if(keys.ArrowDown){ 
+//         player.direction.y = 1
+//     }else if(keys.ArrowUp){ 
+//         player.direction.y = -1
+//     }else{
+//         player.direction.y = 0;
+//     }
+
+
+// }
+// Update game state such as player position
 function update(deltaTime) {
-  let direction = new Vector(0, 0);
+  //Gets user input
+  player.update(deltaTime);
 
-  if (keys.ArrowLeft) direction.x -= 1;
-  if (keys.ArrowRight) direction.x += 1;
-
-  direction.normalize();
-  player.velocity = new Vector(direction.x, direction.y);
-  player.velocity.scale(player.speed * deltaTime);
-  player.position.add(player.velocity);
-
-  player.position.x = Math.max(0, Math.min(canvas.width - player.width, player.position.x));
-  player.position.y = Math.max(0, Math.min(canvas.height - player.height, player.position.y));
-
-  player.frameTimer += deltaTime;
-  if (player.frameTimer >= player.frameDelay) {
-    player.frameTimer = 0;
-    player.currentFrame = (player.currentFrame + 1) % player.frames.length;
-  }
 }
 
+// Draw the game
 function draw() {
+  // Clear the canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(
-    player.frames[player.currentFrame], 
-    player.position.x, 
-    player.position.y, 
-    player.width, 
-    player.height
-  );
+
+  // Draw player
+  ctx.fillStyle = 'blue';
+  ctx.fillRect(player.position.x, player.position.y, player.width, player.height);
 }
 
-// Initialization
-setupInput();
-loadFrames();
-requestAnimationFrame(gameLoop);
+
+
+// Start the game loop
+requestAnimationFrame(gameLoop)
