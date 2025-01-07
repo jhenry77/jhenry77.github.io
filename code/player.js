@@ -1,4 +1,5 @@
 import { Vector } from './vector.js';
+// import {importFolder} from './helpful.js'
 
 export class Player {
   constructor() {
@@ -8,9 +9,12 @@ export class Player {
     this.height = 50;
     this.speed = 200;
     this.frames = [];
-    this.currentFrame = 0;
-    this.frameDelay = 0.1;
-    this.frameTimer = 0;
+    this.frameIndex = 0;
+    this.animations ={};
+    this.animationsLength = {}
+    this.status = "down_idle"
+    this.image = new Image();
+    this.image.src = "../graphics/character/down_idle/0.png"
   }
 
   // loadFrames() {
@@ -22,19 +26,90 @@ export class Player {
   //   }
   // }
 
+
+  import_assets(){
+      this.animations =  {
+        'up': ["../graphics/character/up/"],
+        'down': [ "../graphics/character/down/"],
+        'left': [ "../graphics/character/left/"],
+        'right': [ "../graphics/character/right/"],
+				'right_idle':[ "../graphics/character/right_idle/"],
+        'left_idle':[ "../graphics/character/left_idle/"],
+        'up_idle':[ "../graphics/character/up_idle/"],
+        'down_idle':[ "../graphics/character/down_idle/"],
+				'right_hoe':[ "../graphics/character/right_hoe/"],
+        'left_hoe':[ "../graphics/character/left_hoe/"],
+        'up_hoe':[ "../graphics/character/up_hoe/"],
+        'down_hoe':[ "../graphics/character/down_hoe/"],
+				'right_axe':[ "../graphics/character/'right_axe/"],
+        'left_axe':[ "../graphics/character/left_axe/"],
+        'up_axe':[ "../graphics/character/'up_axe/"],
+        'down_axe':[ "../graphics/character/down_axe/"],
+				'right_water':[ "../graphics/character/right_water/"],
+        'left_water':[ "../graphics/character/left_water/"],
+        'up_water':[ "../graphics/character/up_water/"],
+        'down_water':[ "../graphics/character/down_water/"]}
+        this.animationsLength =  {
+          'up': 4 ,
+          'down': 4 ,
+          'left': 4 ,
+          'right': 4,
+          'right_idle': 2,
+          'left_idle': 2,
+          'up_idle': 2,
+          'down_idle':2,
+          'right_hoe':2,
+          'left_hoe':2,
+          'up_hoe':2,
+          'down_hoe':2,
+          'right_axe':2,
+          'left_axe':2,
+          'up_axe':2,
+          'down_axe':2,
+          'right_water':2,
+          'left_water':2,
+          'up_water':2,
+          'down_water':2}
+        
+      // for (const anims in this.animations){
+      //   let path = '../graphics/character/' + anims
+      //   this.animations[anims] = importFolder(path)
+      // }
+
+  }
+
+  animate(deltaTime){
+    this.frameIndex += 4 * deltaTime;
+    if(this.frameIndex >= (this.animationsLength[this.status])){
+      this.frameIndex = 0;
+    }
+    this.image.src = this.animations[this.status] + Math.floor(this.frameIndex) + ".png"
+    // console.log(this.animations[this.status] + Math.floor(this.frameIndex))
+    // console.log(Math.floor(this.frameIndex));
+    // console.log( this.animations[this.status] + Math.floor(this.frameIndex) + ".png")
+    // this.image.src = this.animations[this.status] + this.frameIndex + ".png"
+  }
+  //Gets input from user and uses this information to set direction as well as status
   getInput(keys) {
+    // Moving Left
     if (keys.ArrowLeft) { 
       this.direction.x = -1;
+      this.status = 'left';
+    // Moving Right
     } else if (keys.ArrowRight) {
       this.direction.x = 1;
+      this.status = 'right';
     } else {
       this.direction.x = 0;
     }
-
+    // Moving Down
     if (keys.ArrowDown) { 
       this.direction.y = 1;
+      this.status = 'down';
+    // Moving Up
     } else if (keys.ArrowUp) { 
       this.direction.y = -1;
+      this.status = 'up';
     } else {
       this.direction.y = 0;
     }
@@ -54,9 +129,21 @@ export class Player {
     this.position.y += this.direction.y;
   }
 
+  //This funciton is called every frame
   update(deltaTime){
     this.getInput(keys);
     this.move(deltaTime);
+    this.animate(deltaTime);
+  }
+
+  getStatus(){
+    // Making it so if the player isnt moving then they will play their idle
+    if (this.direction.magnitude() == 0){
+        this.status = this.status.split('_')[0] + '_idle'
+    }
+
+    // if (self.timers['toolUse'].active:
+    //     self.status = self.status.split('_')[0] + '_' + self.selectedTool
   }
 }
 

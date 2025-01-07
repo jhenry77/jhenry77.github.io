@@ -21,5 +21,11 @@ export class Vector {
         this.y /= length;
       }
     }
+
+    magnitude(){
+      let mag = Math.sqrt(Math.pow(this.x,2) + Math.pow(this.y,2));
+      mag = Math.abs(mag);
+      return mag
+    }
   }
   

@@ -12,6 +12,7 @@ canvas.height = 600;
 
 let lastTime = performance.now();
 const player = new Player();
+player.import_assets();
 
 
 
@@ -34,26 +35,7 @@ function gameLoop(timestamp) {
   // Loop
    requestAnimationFrame(gameLoop);
 }
-//Listens for specific user input
-// function getInput(){
-//     if (keys.ArrowLeft){ 
-//         player.direction.x = -1
-//     }else if (keys.ArrowRight){
-//         player.direction.x = 1
-//     }else{
-//         player.direction.x = 0;
-//     }
 
-//     if(keys.ArrowDown){ 
-//         player.direction.y = 1
-//     }else if(keys.ArrowUp){ 
-//         player.direction.y = -1
-//     }else{
-//         player.direction.y = 0;
-//     }
-
-
-// }
 // Update game state such as player position
 function update(deltaTime) {
   //Gets user input
@@ -67,8 +49,10 @@ function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Draw player
-  ctx.fillStyle = 'blue';
-  ctx.fillRect(player.position.x, player.position.y, player.width, player.height);
+  // ctx.fillStyle = 'blue';
+  // ctx.fillRect(player.position.x, player.position.y, player.width, player.height);a
+
+  ctx.drawImage(player.image, player.position.x, player.position.y);
 }
 
 
