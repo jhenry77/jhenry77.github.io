@@ -1,32 +1,45 @@
 import { Vector } from './vector.js';
 import {preloadImages} from './helpful.js'
+import { Timer } from './timer.js';
 
 export class Player {
   constructor() {
+    // Player Postion/Movement
     this.position = new Vector(100, 500);
     this.direction = new Vector(0, 0);
     this.width = 50;
     this.height = 50;
     this.speed = 200;
-    this.frames = [];
+    // Player Animations
     this.frameIndex = 0;
     this.animations ={};
     this.animationsLength = {}
     this.status = "down_idle"
     this.image = new Image();
     this.image.src = "../graphics/character/down_idle/0.png"
+    // Player tools
+    this.tools = ['hoe','axe','water']
+    this.toolNum = 0
+    this.selectedTool = this.tools[this.toolNum]
+    this.timers = {'tool_use': new Timer(350,() => this.use_tool()),
+                    'tool_switch': new Timer(350),
+                  'seed_use': new Timer(350, () => this.use_seed())
+    }
+    // Player seeds
+    this.seeds = ['corn','tomato']
+    this.seedNum = 0
+    this.selectedSeed = this.seeds[this.seedNum]
+  }
+  //Is called when a tool is used.
+  use_tool(){
+    console.log(this.selectedTool);
   }
 
-  // loadFrames() {
-  //   let frameCount = 4; // Replace with your frame count
-  //   for (let i = 0; i < frameCount; i++) {
-  //     let img = new Image();
-  //     img.src = `player_frame_${i}.png`; // Replace with actual filenames
-  //     this.frames.push(img);
-  //   }
-  // }
+  use_seed(){
+    console.log(this.selectedSeed);
+  }
 
-
+  //Helpful funciton to preload assets
   import_assets(){
       this.animations =  {
         'up': ["../graphics/character/up/"],
@@ -81,50 +94,105 @@ export class Player {
           urls.push(imagePath);
         }
       }
-      console.log(urls);
       preloadImages(urls);
 
   }
 
+  //Controls all animations, by setting image source from status and using delta time to determine the animation frame
   animate(deltaTime){
     this.frameIndex += 4 * deltaTime;
     if(this.frameIndex >= (this.animationsLength[this.status])){
       this.frameIndex = 0;
     }
     this.image.src = this.animations[this.status] + Math.floor(this.frameIndex) + ".png"
-    // console.log(this.animations[this.status] + Math.floor(this.frameIndex))
-    // console.log(Math.floor(this.frameIndex));
-    // console.log( this.animations[this.status] + Math.floor(this.frameIndex) + ".png")
+    
     // this.image.src = this.animations[this.status] + this.frameIndex + ".png"
   }
+
   //Gets input from user and uses this information to set direction as well as status
   getInput(keys) {
-    // Moving Left
-    if (keys.ArrowLeft) { 
-      this.direction.x = -1;
-      this.status = 'left';
-    // Moving Right
-    } else if (keys.ArrowRight) {
-      this.direction.x = 1;
-      this.status = 'right';
-    } else {
+    // Makes sure the user cannot do anything while using the tool
+    if(!this.timers['tool_use'].active && !this.timers['seed_use'].active){
+      
+      //Tool Input/Use
+      if(keys[' ']){
+        this.timers['tool_use'].activate();
+        this.direction.x, this.direction.y = 0,0;
+        this.frameIndex = 0;
+      }
+
+      if(keys['e']){
+        this.timers['seed_use'].activate();
+        this.direction.x, this.direction.y = 0,0;
+      }
+
+      // Changing tools
+      //Hoe tool case
+      if(keys['1'] && !this.timers['tool_switch'].active){
+        this.timers['tool_switch'].activate();
+        this.toolNum = 0;
+        this.selectedTool = this.tools[this.toolNum]
+      }
+      //Axe tool case
+      if(keys['2'] && !this.timers['tool_switch'].active){
+        this.timers['tool_switch'].activate();
+        this.toolNum = 1;
+        this.selectedTool = this.tools[this.toolNum]
+      }
+      // Watering can Tool case
+      if(keys['3'] && !this.timers['tool_switch'].active){
+        this.timers['tool_switch'].activate();
+        this.toolNum = 2;
+        this.selectedTool = this.tools[this.toolNum]
+      }
+
+      // Seed inputs
+      if(keys['4']){
+        this.seedNum = 0;
+        this.selectedSeed = this.seeds[this.seedNum]
+      }
+      //Axe tool case
+      if(keys['5'] && !this.timers['tool_switch'].active){
+        this.seedNum = 1;
+        this.selectedSeed = this.seeds[this.seedNum]
+      }
+    
+      //Direction Movements
+
+      //Left Movement
+      if (keys['a']) { 
+        this.direction.x = -1;
+        this.status = 'left';
+
+      // Moving Right
+      } else if (keys['d']) {
+        this.direction.x = 1;
+        this.status = 'right';
+
+      } else {
+        this.direction.x = 0;
+      }
+
+      // Moving Down
+      if (keys['s']) { 
+        this.direction.y = 1;
+        this.status = 'down';
+
+      // Moving Up
+      } else if (keys['w']) { 
+        this.direction.y = -1;
+        this.status = 'up';
+        
+      } else {
+        this.direction.y = 0;
+      }
+    }else{
       this.direction.x = 0;
-    }
-    // Moving Down
-    if (keys.ArrowDown) { 
-      this.direction.y = 1;
-      this.status = 'down';
-    // Moving Up
-    } else if (keys.ArrowUp) { 
-      this.direction.y = -1;
-      this.status = 'up';
-    } else {
       this.direction.y = 0;
     }
   }
 
   move(deltaTime){
-
     this.direction.normalize();
     // Horizontal Movement, Scales the direction by our variable speed and the amount of time that has passed, and then adds that to the player direction
     this.direction.x *= this.speed;
@@ -136,12 +204,24 @@ export class Player {
     this.direction.y *= deltaTime;
     this.position.y += this.direction.y;
   }
-
+  updateTimers(){
+    for (let timer of Object.values(this.timers)) { // Iterates over actual objects
+      timer.update(); // Works because 'timer' is now an object
+  }
+  }
   //This funciton is called every frame
   update(deltaTime){
+
+
     this.getInput(keys);
+    this.updateTimers();
+    this.getStatus();
+   
+
+
     this.move(deltaTime);
     this.animate(deltaTime);
+   
   }
 
   getStatus(){
@@ -150,8 +230,8 @@ export class Player {
         this.status = this.status.split('_')[0] + '_idle'
     }
 
-    // if (self.timers['toolUse'].active:
-    //     self.status = self.status.split('_')[0] + '_' + self.selectedTool
+    if (this.timers['tool_use'].active)
+       this.status = this.status.split('_')[0] + "_" + this.selectedTool;
   }
 }
 
